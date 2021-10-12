@@ -27,7 +27,7 @@ let ROW_HEIGHT = 42
 let ITEM_HEIGHT = 30
 
 
-new GanttChart {
+class GanttChart {
   constructor(chartData, sidebarData, chartItem) {
     this.chartData = chartData /* matrix */
     this.sidebarData = sidebarData /* vector */
