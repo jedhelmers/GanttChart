@@ -55,19 +55,38 @@ new GanttChart {
     this.chartItem = chartItem
   }
 
-  getSVGParamsForItem(row) {
+  setAttribs(element, obj) {
+    Object.keys(obj).forEach(key => {
+      element.setAttribute(key, obj[key])
+    })
+  }
+
+  renderToday() {
+    const time = +new Date()
+    const params = {
+      x: `${time / this.timeWidth * 100}%`,
+      y: 0,
+      width: 4,
+      height: '100%',
+      class: 'o-gantt-today'
+    }
+    const today = document.createElement('svg')
+    this.setAttribs(today, params)
+    return today
+  }
+
+  renderItem(row) {
     const params = {
       x: `${(row[START] - this.timeBoundary[0]) / this.timeWidth * 100}%`, /* relative positioning */
       y: row[SORT_ID] * ROW_HEIGHT, /* static positioning */
       width: `${(row[END] - row[START] / this.timeWidth) * 100}%`, /* relative width */
       height: ITEM_HEIGHT,
+      class: 'o-gantt-item'
     }
 
     const svg = document.createElement('svg')
     const fo = document.createElement('foreignObject')
-    Object.keys(params).forEach(key => {
-      fo.setAttribute(key, params[key])
-    })
+    this.setAttribs(fo, params)
     fo.appendChild(this.chartItem[i])
     svg.appendChild(fo)
 
