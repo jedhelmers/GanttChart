@@ -13,6 +13,14 @@
 
     time is stashed as miliseconds as it's more performant
 
+  rawData:
+    [
+      {obj}
+    ]
+
+    This represents the raw data. With it, you can render sidebar column items or reference it within
+    your ChartItems
+
 */
 
 // Chart Data indices
@@ -29,9 +37,9 @@ let ITEM_HEIGHT = 30
 
 
 class GanttChart {
-  constructor(chartData, sidebarData, chartItem) {
+  constructor(chartData, rawData, chartItem) {
     this.chartData = chartData /* matrix */
-    this.sidebarData = sidebarData /* vector */
+    this.rawData = rawData /* vector */
     this.chartItem = chartItem /* vector of UI Components */
 
     this.timeBoundary = [1, 2] /* min start - max end + offset stuff */
@@ -48,8 +56,8 @@ class GanttChart {
     this.timeWidth = end - start
   }
 
-  setSidebarData(sidebarData) {
-    this.sidebarData = sidebarData
+  setRawData(rawData) {
+    this.rawData = rawData
   }
 
   setChartItem(chartItem) {
@@ -127,7 +135,7 @@ class GanttChart {
     return today
   }
 
-  renderItem(row, i = 0) {
+  renderItem(row, obj, i = 0) {
     const params = {
       x: `${(row[START] - this.timeBoundary[0]) / this.timeWidth * 100}%`, /* relative positioning */
       y: i * ROW_HEIGHT, /* static positioning */
@@ -138,12 +146,12 @@ class GanttChart {
     }
 
     const svg = document.createElement('svg')
-    svg.setAttribute('id', `gantt-svg-wrapper-${i}`)
+    svg.setAttribute('id', `gantt-svg-wrapper-${obj.id}`)
     svg.setAttribute('width', '100%')
     svg.setAttribute('height', ROW_HEIGHT)
     const fo = document.createElement('foreignObject')
     this.setAttribs(fo, params)
-    fo.appendChild(this.chartItem[row[CHART_ITEM_INDEX]](i))
+    fo.appendChild(this.chartItem[row[CHART_ITEM_INDEX]](obj))
     svg.appendChild(fo)
 
     return fo
@@ -158,7 +166,7 @@ class GanttChart {
     const chartItems = []
     this.setAttribs(chart, params)
     this.chartData.sort((a, b) => a[SORT_ID] < b[SORT_ID] ? -1 : 1).forEach((row, i) => {
-      chartItems.push(this.renderItem(row, i))
+      chartItems.push(this.renderItem(row, this.rawData.find((obj) => obj.id === row[ID]), i))
     });
 
     const relationships = []
@@ -195,19 +203,39 @@ class GanttChart {
 
 function runTest() {
   f = new GanttChart()
+  const dates = [
+    [+new Date('10/12/2021'), +new Date('10/30/2021')],
+    [+new Date('10/1/2021'), +new Date('10/17/2021')],
+    [+new Date('10/5/2021'), +new Date('10/7/2021')],
+    [+new Date('10/9/2021'), +new Date('10/20/2021')],
+    [+new Date('10/2/2021'), +new Date('10/27/2021')],
+    [+new Date('10/18/2021'), +new Date('10/19/2021')]
+  ]
+  f.setRawData(new Array(6).fill(0).map((a, i) => (
+    {
+      id: i,
+      title: `${i}-Howdy!`,
+      description: "I'm an item description",
+      itemType: 0,
+      start: dates[i][0],
+      end: dates[i][1],
+      relationships: []
+    }
+  )))
   f.setChartData([
-    [0, 4, 0, +new Date('10/12/2021'), +new Date('10/30/2021'), []],
-    [1, 3, 0, +new Date('10/1/2021'), +new Date('10/17/2021'), []],
-    [2, 1, 0, +new Date('10/5/2021'), +new Date('10/7/2021'), [5, 3, 4]],
-    [3, 5, 0, +new Date('10/9/2021'), +new Date('10/20/2021'), []],
-    [4, 2, 0, +new Date('10/2/2021'), +new Date('10/27/2021'), []],
-    [5, 0, 0, +new Date('10/18/2021'), +new Date('10/19/2021'), [1]]
+    [0, 4, 0, dates[0][0], dates[0][1], []],
+    [1, 3, 0, dates[1][0], dates[1][1], []],
+    [2, 1, 0, dates[2][0], dates[2][1], [5, 3, 4]],
+    [3, 5, 0, dates[3][0], dates[3][1], []],
+    [4, 2, 0, dates[4][0], dates[4][1], []],
+    [5, 0, 0, dates[5][0], dates[5][1], [1]]
   ])
-  f.setSidebarData(['Butthead'])
-  f.setChartItem([(i) => {
+
+  f.setChartItem([(obj) => {
+    /* INSERT COMPONENT HERE. It will pass the RAW DATA ROW back to you to reference. */
     item = document.createElement('div')
-    item.setAttribute('id', `${i}-buttheads`)
-    item.innerText = "HOWDY!"
+    item.setAttribute('id', `${obj.id}-buttheads`)
+    item.innerText = `${obj.title}: ${obj.description}`
     return item
   }])
   f.renderToday()
