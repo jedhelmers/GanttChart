@@ -82,7 +82,7 @@ class GanttChart {
     this.setChartBegin(date)
     return this.renderChart()
   }
-  
+
   setChartEndAndRender(date) {
     this.setChartEnd(date)
     return this.renderChart()
@@ -134,7 +134,8 @@ class GanttChart {
   }
 
   renderRelationship(from, to) {
-    // console.log(`${from} => ${to}`)
+    const m = ((to.offsetTop - to.scrollTop) - (from.offsetTop - from.scrollTop)) / ((to.offsetLeft - to.scrollLeft) - (from.offsetLeft - from.scrollLeft))
+    console.log('M', m)
     const relationship = document.createElement('path')
     const params = {
       id: `${from.id}-to-${to.id}`,
