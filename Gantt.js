@@ -1,6 +1,6 @@
 /*
 
-  chartData:
+  CHART DATA:
     [
       [id, sortId, chartItemIndex, start(miliseconds), end(miliseconds)]
     ]
@@ -13,13 +13,17 @@
 
     time is stashed as miliseconds as it's more performant
 
-  rawData:
+  RAW DATA:
     [
       {obj}
     ]
 
     This represents the raw data. With it, you can render sidebar column items or reference it within
     your ChartItems
+
+  CHART ITEM:
+    This much match in count with your number of semantic types. In a nutshell, your
+    chartItemIndex is a type of status or differentiation.
 
 */
 
@@ -62,6 +66,26 @@ class GanttChart {
 
   setChartItem(chartItem) {
     this.chartItem = chartItem
+  }
+
+  setChartBegin(date) {
+    this.timeBoundary[0] = +new Date(date)
+    this.timeWidth = this.timeWidth[1] - this.timeWidth[0]
+  }
+
+  setChartEnd(date) {
+    this.timeBoundary[1] = +new Date(date)
+    this.timeWidth = this.timeWidth[1] - this.timeWidth[0]
+  }
+
+  setChartBeginAndRender(date) {
+    this.setChartBegin(date)
+    return this.renderChart()
+  }
+  
+  setChartEndAndRender(date) {
+    this.setChartEnd(date)
+    return this.renderChart()
   }
 
   setAttribs(element, obj) {
