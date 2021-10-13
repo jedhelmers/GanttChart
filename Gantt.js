@@ -49,6 +49,7 @@ class GanttChart {
     this.timeBoundary = [1, 2] /* min start - max end + offset stuff */
     this.timeWidth = 0
     this.uiScale = 1
+    this.rerender = false /* when forcing a rerender is needed, this gives you something to hook into */
   }
 
   setChartData(chartData) {
@@ -71,21 +72,13 @@ class GanttChart {
   setChartBegin(date) {
     this.timeBoundary[0] = +new Date(date)
     this.timeWidth = this.timeWidth[1] - this.timeWidth[0]
+    this.rerender = true
   }
 
   setChartEnd(date) {
     this.timeBoundary[1] = +new Date(date)
     this.timeWidth = this.timeWidth[1] - this.timeWidth[0]
-  }
-
-  setChartBeginAndRender(date) {
-    this.setChartBegin(date)
-    return this.renderChart()
-  }
-
-  setChartEndAndRender(date) {
-    this.setChartEnd(date)
-    return this.renderChart()
+    this.rerender = true
   }
 
   setAttribs(element, obj) {
@@ -183,6 +176,7 @@ class GanttChart {
   }
 
   renderChart() {
+    this.rerender = false
     const chart = document.createElement('div')
     const params = {
       class: 'o-gantt-chart',
