@@ -21,6 +21,7 @@ let SORT_ID = 1
 let CHART_ITEM_INDEX = 2
 let START = 3
 let END = 4
+let RELATIONS = 5
 
 // consts
 let ROW_HEIGHT = 42
@@ -100,6 +101,18 @@ class GanttChart {
       })
   }
 
+  renderRelationship(from, to) {
+    // console.log(`${from} => ${to}`)
+    const relationship = document.createElement('path')
+    const params = {
+      id: `${from.id}-to-${to.id}`,
+      class: 'gantt-relationship-line',
+      d: ''
+    }
+    this.setAttribs(relationship, params)
+    return relationship
+  }
+
   renderToday() {
     const time = +new Date()
     const params = {
@@ -109,15 +122,15 @@ class GanttChart {
       height: '100%',
       class: 'o-gantt-today'
     }
-    const today = document.createElement('svg')
+    const today = document.createElement('line')
     this.setAttribs(today, params)
     return today
   }
 
-  renderItem(row) {
+  renderItem(row, i = 0) {
     const params = {
       x: `${(row[START] - this.timeBoundary[0]) / this.timeWidth * 100}%`, /* relative positioning */
-      y: row[SORT_ID] * ROW_HEIGHT, /* static positioning */
+      y: i * ROW_HEIGHT, /* static positioning */
       width: `${((row[END] - row[START]) / this.timeWidth) * 100}%`, /* relative width */
       height: ITEM_HEIGHT,
       class: 'o-gantt-item',
@@ -125,13 +138,15 @@ class GanttChart {
     }
 
     const svg = document.createElement('svg')
+    svg.setAttribute('id', `gantt-svg-wrapper-${i}`)
+    svg.setAttribute('width', '100%')
+    svg.setAttribute('height', ROW_HEIGHT)
     const fo = document.createElement('foreignObject')
     this.setAttribs(fo, params)
-    // console.log(row[ID], this.chartItem[row[CHART_ITEM_INDEX]])
-    fo.appendChild(this.chartItem[row[CHART_ITEM_INDEX]]())
+    fo.appendChild(this.chartItem[row[CHART_ITEM_INDEX]](i))
     svg.appendChild(fo)
 
-    return svg
+    return fo
   }
 
   renderChart() {
@@ -140,27 +155,62 @@ class GanttChart {
       class: 'o-gantt-chart',
       id: 'gantt-chart'
     }
+    const chartItems = []
     this.setAttribs(chart, params)
     this.chartData.sort((a, b) => a[SORT_ID] < b[SORT_ID] ? -1 : 1).forEach((row, i) => {
-      chart.appendChild(this.renderItem(row))
+      chartItems.push(this.renderItem(row, i))
     });
+
+    const relationships = []
+    this.chartData.sort((a, b) => a[ID] < b[ID] ? -1 : 1).forEach((row, i) => {
+      row[RELATIONS].forEach(to => {
+        relationships.push(this.renderRelationship(
+          chartItems[this.chartData.findIndex(r => r[ID] === row[ID])],
+          chartItems[this.chartData.findIndex(r => r[ID] === to)]
+        ))
+      })
+    })
+
+    const svg = document.createElement('svg')
+
+    relationships.forEach((item) => {
+      svg.appendChild(item)
+    })
+
+    chart.appendChild(svg)
+
+    chartItems.forEach((item) => {
+      svg.appendChild(item)
+    })
+
+    svg.appendChild(this.renderToday())
+
+    chart.appendChild(svg)
+
+
     return chart
   }
 }
 
 
-f = new GanttChart()
-f.setChartData([
-  [0, 4, 0, +new Date('10/12/2021'), +new Date('10/30/2021')],
-  [1, 3, 0, +new Date('10/1/2021'), +new Date('10/17/2021')],
-  [2, 1, 0, +new Date('10/5/2021'), +new Date('10/7/2021')],
-  [3, 5, 0, +new Date('10/9/2021'), +new Date('10/20/2021')],
-  [4, 2, 0, +new Date('10/2/2021'), +new Date('10/27/2021')],
-  [5, 0, 0, +new Date('10/18/2021'), +new Date('10/19/2021')]
-])
-f.setSidebarData(['Butthead'])
-item = document.createElement('div')
-item.setAttribute('id', 'buttheads')
-item.innerText = "HOWDY!"
-f.setChartItem([() => item])
-f.renderToday()
+function runTest() {
+  f = new GanttChart()
+  f.setChartData([
+    [0, 4, 0, +new Date('10/12/2021'), +new Date('10/30/2021'), []],
+    [1, 3, 0, +new Date('10/1/2021'), +new Date('10/17/2021'), []],
+    [2, 1, 0, +new Date('10/5/2021'), +new Date('10/7/2021'), [5, 3, 4]],
+    [3, 5, 0, +new Date('10/9/2021'), +new Date('10/20/2021'), []],
+    [4, 2, 0, +new Date('10/2/2021'), +new Date('10/27/2021'), []],
+    [5, 0, 0, +new Date('10/18/2021'), +new Date('10/19/2021'), [1]]
+  ])
+  f.setSidebarData(['Butthead'])
+  f.setChartItem([(i) => {
+    item = document.createElement('div')
+    item.setAttribute('id', `${i}-buttheads`)
+    item.innerText = "HOWDY!"
+    return item
+  }])
+  f.renderToday()
+}
+
+runTest()
