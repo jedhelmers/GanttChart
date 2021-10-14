@@ -39,6 +39,13 @@ let RELATIONS = 5
 let ROW_HEIGHT = 42
 let ITEM_HEIGHT = 30
 
+let MINUTE = 0
+let HOUR = 1
+let DAY = 2
+let WEEK = 3
+let MONTH = 4
+let YEAR = 5
+let DECADE = 6
 
 class GanttChart {
   constructor(chartData, rawData, chartItem) {
@@ -50,6 +57,7 @@ class GanttChart {
     this.timeWidth = 0
     this.uiScale = 1
     this.rerender = false /* when forcing a rerender is needed, this gives you something to hook into */
+    this.chronology = DAY
   }
 
   setChartData(chartData) {
@@ -126,6 +134,75 @@ class GanttChart {
       })
   }
 
+  timeConversions() {
+    return {
+      day: 86400000,
+      get week() {
+        return this.day * 7
+      },
+      get month() {
+        return this.day * 30
+      },
+      get year() {
+        return this.day * 365
+      },
+      get decade() {
+        return this.year * 10
+      },
+      get hour() {
+        return this.day / 24
+      },
+      get minute() {
+        return this.hour / 60
+      }
+    }
+  }
+
+  renderColumnLine(i) {
+    const line = document.createElement('line')
+    const params = {
+      x1: `${i * 100}%`,
+      x2: `${i * 100}%`,
+      y1: 0,
+      y2: '100%',
+      class: "gantt-line",
+      id: `gantt-calendar-line-${i * 100}%`
+    }
+    this.setAttribs(line, params)
+    return line
+  }
+
+  renderColumnLines() {
+    let divisions = 1
+    switch(this.chronology) {
+      case MINUTE:
+        divisions = parseInt(this.timeWidth / this.timeConversions().minute) + 1
+        break
+      case HOUR:
+        divisions = parseInt(this.timeWidth / this.timeConversions().hour) + 1
+        break
+      case DAY:
+        divisions = parseInt(this.timeWidth / this.timeConversions().day) + 1
+        break
+      case WEEK:
+        divisions = parseInt(this.timeWidth / this.timeConversions().week) + 1
+        break
+      case MONTH:
+        divisions = parseInt(this.timeWidth / this.timeConversions().month) + 1
+        break
+      case YEAR:
+        divisions = parseInt(this.timeWidth / this.timeConversions().year) + 1
+        break
+      case DECADE:
+        divisions = parseInt(this.timeWidth / this.timeConversions().decade) + 1
+        break
+      default:
+        divisions = 1
+    }
+
+    return new Array(divisions).fill(0).map((a, i) => this.renderColumnLine(i / divisions))
+  }
+
   renderRelationship(from, to) {
     const m = ((to.offsetTop - to.scrollTop) - (from.offsetTop - from.scrollTop)) / ((to.offsetLeft - to.scrollLeft) - (from.offsetLeft - from.scrollLeft))
     console.log('M', m)
@@ -199,6 +276,15 @@ class GanttChart {
     })
 
     const svg = document.createElement('svg')
+    const svgParams = {
+      id: 'gantt-svg-items',
+      width: '100%'
+    }
+    this.setAttribs(svg, svgParams)
+
+    this.renderColumnLines().forEach((item) => {
+      svg.appendChild(item)
+    })
 
     relationships.forEach((item) => {
       svg.appendChild(item)
