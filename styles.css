@@ -8,6 +8,20 @@
 .o-gantt-item {
     background: transparent;
     /* border-radius: 16px; */
+    animation-duration: 0.6s;
+    animation-name: slidein;
+    animation-timing-function: cubic-bezier(0.280, 0.840, 0.420, 1);
+}
+
+@keyframes slidein {
+  0% {
+    transform:scale(1,1) scaleX(0.2);
+    opacity: 0.4;
+  }
+  100% {
+    transform:scale(1,1) scaleX(1);
+    opacity: 1;
+  }
 }
 
 .gantt-relationship-line {
@@ -53,6 +67,10 @@
     width: 100%;
 }
 
-.gantt-line {
+.gantt-col-line {
+    stroke: rgba(0, 0, 0, .12);
+}
+
+.gantt-row-line {
     stroke: rgba(0, 0, 0, .12);
 }
