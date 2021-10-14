@@ -61,12 +61,19 @@ class GanttChart {
     this.VERT_PADDING = (this.ROW_HEIGHT - this.ITEM_HEIGHT) / 2
   }
 
+  setChronology(chronology) {
+    this.chronology = chronology
+    this.rerender = true
+  }
+
   setItemHeight(h) {
     this.ITEM_HEIGHT = h
+    this.rerender = true
   }
 
   setRowHeight(h) {
     this.ROW_HEIGHT = h
+    this.rerender = true
   }
 
   setChartData(chartData) {
