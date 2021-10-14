@@ -11,17 +11,22 @@
 }
 
 .gantt-relationship-line {
-    stroke: blue;
+    stroke: rgba(0, 0, 0, .8);
 }
 
-svg {
+
+.gantt-line {
+    stroke: rgba(0, 0, 0, .2);
+}
+
+.gantt-svg {
     width: 100%;
     /* position: relative; */
     /* top: 0; */
     height: 400px;
 }
 
-line.o-gantt-today {
+.o-gantt-today {
     stroke: black;
     stroke-width: 100px;
 }
