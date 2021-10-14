@@ -35,10 +35,6 @@ let START = 3
 let END = 4
 let RELATIONS = 5
 
-// consts
-let ROW_HEIGHT = 42
-let ITEM_HEIGHT = 30
-
 let MINUTE = 0
 let HOUR = 1
 let DAY = 2
@@ -58,6 +54,19 @@ class GanttChart {
     this.uiScale = 1
     this.rerender = false /* when forcing a rerender is needed, this gives you something to hook into */
     this.chronology = DAY
+
+    // consts
+    this.ROW_HEIGHT = 42
+    this.ITEM_HEIGHT = 20
+    this.VERT_PADDING = (this.ROW_HEIGHT - this.ITEM_HEIGHT) / 2
+  }
+
+  setItemHeight(h) {
+    this.ITEM_HEIGHT = h
+  }
+
+  setRowHeight(h) {
+    this.ROW_HEIGHT = h
   }
 
   setChartData(chartData) {
@@ -160,13 +169,29 @@ class GanttChart {
 
   renderColumnLine(i) {
     const line = document.createElement('line')
+    const x = `${i * 100}%`
     const params = {
-      x1: `${i * 100}%`,
-      x2: `${i * 100}%`,
+      x1: x,
+      x2: x,
       y1: 0,
       y2: '100%',
-      class: "gantt-line",
-      id: `gantt-calendar-line-${i * 100}%`
+      class: "gantt-col-line",
+      id: `gantt-calendar-col-${i * 100}%`
+    }
+    this.setAttribs(line, params)
+    return line
+  }
+
+  renderRowLine(i) {
+    const line = document.createElement('line')
+    const y = i * this.ROW_HEIGHT
+    const params = {
+      x1: 0,
+      x2: '100%',
+      y1: y,
+      y2: y,
+      class: "gantt-row-line",
+      id: `gantt-calendar-row-${i * 100}%`
     }
     this.setAttribs(line, params)
     return line
@@ -233,9 +258,9 @@ class GanttChart {
   renderItem(row, obj, i = 0) {
     const params = {
       x: `${(row[START] - this.timeBoundary[0]) / this.timeWidth * 100}%`, /* relative positioning */
-      y: i * ROW_HEIGHT, /* static positioning */
+      y: i * this.ROW_HEIGHT +this.VERT_PADDING, /* static positioning */
       width: `${((row[END] - row[START]) / this.timeWidth) * 100}%`, /* relative width */
-      height: ITEM_HEIGHT,
+      height: this.ITEM_HEIGHT,
       class: 'o-gantt-item',
       id: `gantt-item-${row[ID]}`
     }
@@ -243,7 +268,7 @@ class GanttChart {
     const svg = document.createElement('svg')
     svg.setAttribute('id', `gantt-svg-wrapper-${obj.id}`)
     svg.setAttribute('width', '100%')
-    svg.setAttribute('height', ROW_HEIGHT)
+    svg.setAttribute('height', this.ROW_HEIGHT)
     const fo = document.createElement('foreignObject')
     this.setAttribs(fo, params)
     fo.appendChild(this.chartItem[row[CHART_ITEM_INDEX]](obj))
@@ -285,6 +310,10 @@ class GanttChart {
     this.renderColumnLines().forEach((item) => {
       svg.appendChild(item)
     })
+
+    new Array(Math.max(20, this.chartData.length)).fill(0).forEach((_, i) => {
+      svg.appendChild(this.renderRowLine(i))
+    });
 
     relationships.forEach((item) => {
       svg.appendChild(item)
