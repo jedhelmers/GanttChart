@@ -1,8 +1,8 @@
 #gantt-chart {
-    background: pink;
+    background: rgba(240, 240, 240, 1);
     position: relative;
     border-radius: 4px;
-    border: 12px solid pink;
+    border: 12px solid rgba(230, 230, 230, 1);
 }
 
 .o-gantt-item {
@@ -11,12 +11,7 @@
 }
 
 .gantt-relationship-line {
-    stroke: rgba(0, 0, 0, .8);
-}
-
-
-.gantt-line {
-    stroke: rgba(0, 0, 0, .2);
+    stroke: rgba(0, 0, 0, .12);
 }
 
 .gantt-svg {
@@ -43,9 +38,21 @@
     justify-content: center;
     height: 100%;
     border-radius: 16px;
-    background: rgba(255, 0, 0, .2);
+    background: rgba(255, 0, 0, .42);
 }
 
 [id*=-buttheads]:hover {
     background: rgba(255, 0, 0, .3);
+}
+
+
+#gantt-svg-items {
+    /* x: 400px; */
+    /* y: 200px; */
+    height:  400px;
+    width: 100%;
+}
+
+.gantt-line {
+    stroke: rgba(0, 0, 0, .12);
 }
