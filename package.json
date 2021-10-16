@@ -1,0 +1,25 @@
+{
+  "name": "universal-gantt-chart-js",
+  "version": "1.0.1",
+  "description": "I present to you... a ubiquitous vanilla js gantt chart that's consumable by virtually any javascript framework",
+  "main": "Gantt.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jedhelmers/GanttChart.git"
+  },
+  "keywords": [
+    "gantt",
+    "chart",
+    "data",
+    "visualization"
+  ],
+  "author": "Jed Helmers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jedhelmers/GanttChart/issues"
+  },
+  "homepage": "https://github.com/jedhelmers/GanttChart#readme"
+}

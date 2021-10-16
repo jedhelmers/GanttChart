@@ -43,6 +43,22 @@ let MONTH = 4
 let YEAR = 5
 let DECADE = 6
 
+const gc = {
+  ID,
+  SORT_ID,
+  CHART_ITEM_INDEX,
+  START,
+  END,
+  RELATIONS,
+  MINUTE,
+  HOUR,
+  DAY,
+  WEEK,
+  MONTH,
+  YEAR,
+  DECADE,
+}
+
 class GanttChart {
   constructor(chartData, rawData, chartItem) {
     this.chartData = chartData /* matrix */
@@ -383,3 +399,8 @@ function runTest() {
 }
 
 runTest()
+
+module.exports = {
+  GanttChart,
+  gc
+}
